@@ -13,5 +13,24 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="requests">
+      <UniqueIdentifier>{22fc71d3-7feb-4e40-ba6f-5505e6e57509}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="http.cpp">
+      <Filter>requests</Filter>
+    </ClCompile>
+    <ClCompile Include="utils.cpp">
+      <Filter>requests</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="http.h">
+      <Filter>requests</Filter>
+    </ClInclude>
+    <ClInclude Include="utils.h">
+      <Filter>requests</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
