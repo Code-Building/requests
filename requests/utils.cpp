@@ -29,6 +29,15 @@ namespace ReqUtils
 		return uri;
 	}
 
+	std::string generatePost(Requests::post_data pdata_map)
+	{
+		std::string generated;
+			for (auto& it : pdata_map)
+				generated += it.first + "=" + it.second + "&";
+		generated.pop_back();
+		return generated;
+	}
+
 	std::string returnBetween(const std::string& s, const std::string& start_delim, const std::string& stop_delim)
 	{
 		unsigned first_delim_pos = s.find(start_delim);
