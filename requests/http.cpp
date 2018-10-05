@@ -25,37 +25,40 @@ namespace Requests
 		sock_addr.sin_family = AF_INET;
 		sock_addr.sin_addr.s_addr = *reinterpret_cast<unsigned long *>(host->h_addr);
 
-		//std::cout << get_request_raw << std::endl;
-
 		auto get_http = "GET " + get_request_raw + " HTTP/1.1\r\nHost: " + request_host + "\r\nConnection: close\r\n\r\n";
 
 		//std::cout << get_http << std::endl;
 
 		if (connect(Socket, reinterpret_cast<SOCKADDR *>(&sock_addr), sizeof(sock_addr)) != 0)
-			throw std::invalid_argument("could not connect");
+			throw std::exception("Could not connect through Socket.");
 
 		send(Socket, get_http.c_str(), strlen(get_http.c_str()), 0);
 
-		int nDataLength;
-		while ((nDataLength = recv(Socket, buffer, 10000, 0)) > 0) {}
+		recv(Socket, buffer, 10000, 0);
 		closesocket(Socket);
 		WSACleanup();
 
 		const auto rawBuff = std::string(buffer);
+		this_req->tmp_buff = rawBuff;
 		this_req->content_length = atoi(ReqUtils::returnBetween(rawBuff, "Content-Length: ", "\r\n").c_str());
 		this_req->status_code = ReqUtils::returnBetween(rawBuff, "HTTP/1.1 ", "\r\n");
+		this_req->date = ReqUtils::returnBetween(rawBuff, "Date: ", "\r\n");
+		this_req->server = ReqUtils::returnBetween(rawBuff, "Server: ", "\r\n");
+		this_req->last_modified = ReqUtils::returnBetween(rawBuff, "Last-Modified: ", "\r\n");
+		this_req->content_type = ReqUtils::returnBetween(rawBuff, "Content-Type: ", "\r\n");
+
 
 		std::string reverse_buff;
 		auto len = this_req->content_length;
 
-		for (auto buffIteration = sizeof buffer / sizeof *buffer; buffIteration != 0; --buffIteration)
+		for (auto buff_iteration = sizeof buffer / sizeof *buffer; buff_iteration != 0; --buff_iteration)
 		{
-			if (buffer[buffIteration] >= 32 || buffer[buffIteration] == '\n' || buffer[buffIteration] == '\r')
+			if (buffer[buff_iteration] >= 32 || buffer[buff_iteration] == '\n' || buffer[buff_iteration] == '\r')
 			{
 				while (len != 0)
 				{
-					reverse_buff += buffer[buffIteration];
-					buffIteration--;
+					reverse_buff += buffer[buff_iteration];
+					buff_iteration--;
 					len--;
 				}
 			}

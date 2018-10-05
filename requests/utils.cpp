@@ -33,9 +33,10 @@ namespace ReqUtils
 	{
 		unsigned first_delim_pos = s.find(start_delim);
 		unsigned end_pos_of_first_delim = first_delim_pos + start_delim.length();
-		unsigned last_delim_pos = s.find(stop_delim);
+		std::string fixed_next_search = s.substr(end_pos_of_first_delim);
+		unsigned last_delim_pos = fixed_next_search.find(stop_delim);
 
-		return s.substr(end_pos_of_first_delim,
-			last_delim_pos - end_pos_of_first_delim);
+		return fixed_next_search.substr(0,
+			last_delim_pos);
 	}
 }
