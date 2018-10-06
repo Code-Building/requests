@@ -28,7 +28,7 @@ namespace Requests
 	};
 
 
-	request* get(std::string url, req_headers h_data = DEFAULT_HEADERS, u_short port = 80);
+	request* get(std::string url, const req_headers& h_data = DEFAULT_HEADERS, u_short port = 80);
 	request* post(std::string url, post_data pdata, req_headers h_data = DEFAULT_POST_HEADERS,u_short port = 80);
 
 }
