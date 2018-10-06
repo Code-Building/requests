@@ -6,7 +6,8 @@
 
 namespace Requests
 {
-	request * get(std::string url, u_short port)
+
+	request * get(std::string url, req_headers h_data, u_short port)
 	{
 		auto this_req = new request;
 		char buffer[10000];
@@ -25,7 +26,9 @@ namespace Requests
 		sock_addr.sin_family = AF_INET;
 		sock_addr.sin_addr.s_addr = *reinterpret_cast<unsigned long *>(host->h_addr);
 
-		auto get_http = "GET " + get_request_raw + " HTTP/1.1\r\nHost: " + request_host + "\r\nConnection: close\r\n\r\n";
+		auto get_http = "GET " + get_request_raw + " HTTP/1.1\r\nHost: " +
+			request_host + "\r\n"+ 
+			ReqUtils::parse_headers(h_data) + "\r\n\r\n";
 
 		if (connect(Socket, reinterpret_cast<SOCKADDR *>(&sock_addr), sizeof(sock_addr)) != 0)
 			throw std::exception("Could not connect through Socket.");
@@ -43,6 +46,7 @@ namespace Requests
 		this_req->server = ReqUtils::returnBetween(rawBuff, "Server: ", "\r\n");
 		this_req->last_modified = ReqUtils::returnBetween(rawBuff, "Last-Modified: ", "\r\n");
 		this_req->content_type = ReqUtils::returnBetween(rawBuff, "Content-Type: ", "\r\n");
+		this_req->content_encoding = ReqUtils::returnBetween(rawBuff, "Content-Encoding: ", "\r\n");
 
 
 		std::string reverse_buff;
@@ -51,14 +55,12 @@ namespace Requests
 		for (auto buff_iteration = sizeof buffer / sizeof *buffer; buff_iteration != 0; --buff_iteration)
 		{
 			if (buffer[buff_iteration] >= 32 || buffer[buff_iteration] == '\n' || buffer[buff_iteration] == '\r')
-			{
 				while (len != 0)
 				{
 					reverse_buff += buffer[buff_iteration];
 					buff_iteration--;
 					len--;
 				}
-			}
 		}
 
 		std::string response(reverse_buff);
@@ -68,7 +70,7 @@ namespace Requests
 		return this_req;
 	}
 
-	request* post(std::string url, post_data pdata, u_short port)
+	request* post(std::string url, post_data pdata, req_headers h_data, u_short port)
 	{
 		auto this_req = new request;
 		char buffer[10000];
@@ -89,12 +91,12 @@ namespace Requests
 
 		auto post_data_str = ReqUtils::generatePost(pdata);
 
-		auto post_http = "POST " + requested_uri_raw + " HTTP/1.1\r\nHost: " + request_host +
-			"\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length:" + std::to_string(
-				post_data_str.length())
-			+ " \r\nAccept-Charset: utf-8\r\n\r\n" + post_data_str + "\r\n\r\n";
+		auto post_http = "POST " + requested_uri_raw + " HTTP/1.1\r\nHost: " + request_host + "\r\n"+
+			ReqUtils::parse_headers(h_data) + "Content-Length: " + std::to_string(
+				post_data_str.length())+
+			"\r\n\r\n" + post_data_str + "\r\n\r\n";
 
-		std::cout << post_data_str << std::endl;
+		//std::cout << post_http << std::endl;
 
 		if (connect(Socket, reinterpret_cast<SOCKADDR *>(&sock_addr), sizeof(sock_addr)) != 0)
 			throw std::exception("Could not connect through Socket.");

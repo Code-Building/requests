@@ -18,14 +18,20 @@ namespace ReqUtils
 		return output;
 	}
 
+	std::string parse_headers(std::map<std::string, std::string> h_map)
+	{
+		std::string headers;
+		for (auto& it : h_map)
+			headers += it.first + ": " + it.second + "\r\n";
+		return headers;
+	}
+
 	std::string populateUri(const std::string content)
 	{
 		std::string uri;
 		auto array = split(content, '/');
 		for (auto i = 1; array.size() > i; i++)
 			uri += "/" + array[i];
-		uri += "/";
-		uri.pop_back();
 		return uri;
 	}
 
