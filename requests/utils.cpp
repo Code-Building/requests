@@ -26,7 +26,7 @@ namespace ReqUtils
 		return headers;
 	}
 
-	std::string populateUri(const std::string content)
+	std::string populate_uri(const std::string& content)
 	{
 		std::string uri;
 		auto array = split(content, '/');
@@ -35,7 +35,7 @@ namespace ReqUtils
 		return uri;
 	}
 
-	std::string generatePost(Requests::post_data pdata_map)
+	std::string generate_post(Requests::post_data pdata_map)
 	{
 		std::string generated;
 			for (auto& it : pdata_map)
@@ -44,12 +44,12 @@ namespace ReqUtils
 		return generated;
 	}
 
-	std::string returnBetween(const std::string& s, const std::string& start_delim, const std::string& stop_delim)
+	std::string return_between(const std::string& s, const std::string& start_delim, const std::string& stop_delim)
 	{
-		auto first_delim_pos = s.find(start_delim);
-		auto end_pos_of_first_delim = first_delim_pos + start_delim.length();
-		std::string fixed_next_search = s.substr(end_pos_of_first_delim);
-		auto last_delim_pos = fixed_next_search.find(stop_delim);
+		const auto first_delim_pos = s.find(start_delim);
+		const auto end_pos_of_first_delim = first_delim_pos + start_delim.length();
+		auto fixed_next_search = s.substr(end_pos_of_first_delim);
+		const auto last_delim_pos = fixed_next_search.find(stop_delim);
 
 		return fixed_next_search.substr(0,
 			last_delim_pos);
