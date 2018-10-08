@@ -16,5 +16,5 @@ int main()
 	assert(nf_res->status_code == "404 NOT FOUND");
 
 	printf("That's all :D");
-
+	getchar();
 }

@@ -32,7 +32,7 @@ namespace Requests
 		if (connect(Socket, reinterpret_cast<SOCKADDR *>(&sock_addr), sizeof(sock_addr)) != 0)
 			throw std::exception("Could not connect through Socket.");
 
-		send(Socket, get_http.c_str(), strlen(get_http.c_str()), 0);
+		send(Socket, get_http.c_str(), (int)strlen(get_http.c_str()), 0);
 
 		recv(Socket, buffer, 10000, 0);
 		closesocket(Socket);
@@ -100,7 +100,7 @@ namespace Requests
 		if (connect(Socket, reinterpret_cast<SOCKADDR *>(&sock_addr), sizeof(sock_addr)) != 0)
 			throw std::exception("Could not connect through Socket.");
 
-		send(Socket, post_http.c_str(), strlen(post_http.c_str()), 0);
+		send(Socket, post_http.c_str(), (int)strlen(post_http.c_str()), 0);
 
 		recv(Socket, buffer, 10000, 0);
 		closesocket(Socket);

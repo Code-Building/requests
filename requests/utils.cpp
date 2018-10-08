@@ -46,10 +46,10 @@ namespace ReqUtils
 
 	std::string returnBetween(const std::string& s, const std::string& start_delim, const std::string& stop_delim)
 	{
-		unsigned first_delim_pos = s.find(start_delim);
-		unsigned end_pos_of_first_delim = first_delim_pos + start_delim.length();
+		auto first_delim_pos = s.find(start_delim);
+		auto end_pos_of_first_delim = first_delim_pos + start_delim.length();
 		std::string fixed_next_search = s.substr(end_pos_of_first_delim);
-		unsigned last_delim_pos = fixed_next_search.find(stop_delim);
+		auto last_delim_pos = fixed_next_search.find(stop_delim);
 
 		return fixed_next_search.substr(0,
 			last_delim_pos);
