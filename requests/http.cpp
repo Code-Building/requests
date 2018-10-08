@@ -4,12 +4,18 @@
 
 namespace Requests
 {
-	request * get(const std::string& url, const req_headers& h_data, const u_short port)
+	request * get(std::string url, const req_headers& h_data, const u_short port)
 	{
 		auto this_req = new request;
 		char buffer[10000];
 		WSADATA wsa_data;
 		SOCKADDR_IN sock_addr;
+
+		if (ReqUtils::starts_with(url, "http://"))
+			url = url.substr(7);
+		else if (ReqUtils::starts_with(url, "https://"))
+			url = url.substr(8);
+
 		const auto get_request_raw = ReqUtils::populate_uri(url);
 		const auto request_host = ReqUtils::split(url, '/')[0];
 
@@ -67,12 +73,18 @@ namespace Requests
 		return this_req;
 	}
 
-	request* post(const std::string& url, const post_data& pdata, const req_headers& h_data, const u_short port)
+	request* post(std::string url, const post_data& pdata, const req_headers& h_data, const u_short port)
 	{
 		auto this_req = new request;
 		char buffer[10000];
 		WSADATA wsa_data;
 		SOCKADDR_IN sock_addr;
+
+		if (ReqUtils::starts_with(url, "http://"))
+			url = url.substr(7);
+		else if (ReqUtils::starts_with(url, "https://"))
+			url = url.substr(8);
+
 		const auto requested_uri_raw = ReqUtils::populate_uri(url);
 		const auto request_host = ReqUtils::split(url, '/')[0];
 

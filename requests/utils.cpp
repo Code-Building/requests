@@ -54,4 +54,9 @@ namespace ReqUtils
 		return fixed_next_search.substr(0,
 			last_delim_pos);
 	}
+
+	bool starts_with(const std::string& str, const std::string& who)
+	{
+		return str.rfind(who, 0) == 0;
+	}
 }
