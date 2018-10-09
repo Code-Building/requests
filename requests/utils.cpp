@@ -38,8 +38,8 @@ namespace ReqUtils
 	std::string generate_post(Requests::post_data pdata_map)
 	{
 		std::string generated;
-			for (auto& it : pdata_map)
-				generated += it.first + "=" + it.second + "&";
+		for (auto& it : pdata_map)
+			generated += it.first + "=" + it.second + "&";
 		generated.pop_back();
 		return generated;
 	}
@@ -52,7 +52,7 @@ namespace ReqUtils
 		const auto last_delim_pos = fixed_next_search.find(stop_delim);
 
 		return fixed_next_search.substr(0,
-			last_delim_pos);
+		                                last_delim_pos);
 	}
 
 	bool starts_with(const std::string& str, const std::string& who)

@@ -13,7 +13,7 @@ namespace Requests
 	typedef std::map<std::string, std::string> post_data;
 	typedef std::map<std::string, std::string> req_headers;
 
-	const req_headers DEFAULT_HEADERS = { {"Connection", "close"} };
+	const req_headers DEFAULT_HEADERS = { {"Connection", "close"} , {"Accept-Charset", "utf-8" } };
 	const req_headers DEFAULT_POST_HEADERS = { {"Content-Type", "application/x-www-form-urlencoded"}, {"Accept-Charset", "utf-8" } };
 
 	struct request {

@@ -57,7 +57,7 @@ namespace Requests
 
 		for (auto buff_iteration = sizeof buffer / sizeof *buffer; buff_iteration != 0; --buff_iteration)
 		{
-			if (buffer[buff_iteration] >= 32 || buffer[buff_iteration] == '\n' || buffer[buff_iteration] == '\r')
+			if (buffer[buff_iteration] != -52 || buffer[buff_iteration] == '\n' || buffer[buff_iteration] == '\r')
 				while (len != 0)
 				{
 					reverse_buff += buffer[buff_iteration];
