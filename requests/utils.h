@@ -23,6 +23,6 @@ namespace ReqUtils
 
 	//simple-crypt
 	std::string encryptStr(std::string vulstr);
-	std::string decryptStr(std::string vulstr)
+	std::string decryptStr(std::string vulstr);
 }
 #endif

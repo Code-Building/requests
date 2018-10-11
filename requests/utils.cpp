@@ -66,13 +66,9 @@ namespace ReqUtils
 		for (size_t i = 0; i < vulstr.length(); i++)
 		{
 			if (doinc == 5)
-			{
 				doinc = 0;
-			}
-
 			*(uint8_t*)(&vStr[i]) = *(uint8_t*)(&vulstr[i]) + doinc;
 			doinc++;
-			//cout << vStr[i];
 		}
 		return vStr;
 	}
@@ -84,10 +80,7 @@ namespace ReqUtils
 		for (size_t i = 0; i < vulstr.length(); i++)
 		{
 			if (doinc == 5)
-			{
 				doinc = 0;
-			}
-
 			*(uint8_t*)(&vStr[i]) = *(uint8_t*)(&vulstr[i]) - doinc;
 			doinc++;
 		}
