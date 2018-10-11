@@ -20,5 +20,9 @@ namespace ReqUtils
 	std::vector<std::string> split(const std::string& str, char seperator);
 	std::string return_between(const std::string& s, const std::string& start_delim, const std::string& stop_delim);
 	bool starts_with(const std::string& str, const std::string& who);
+
+	//simple-crypt
+	std::string encryptStr(std::string vulstr);
+	std::string decryptStr(std::string vulstr);
 }
 #endif

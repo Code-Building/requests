@@ -41,8 +41,8 @@ Exemplo requisição POST
 #include <requests/http.h>
 
 Requests::post_data data = {
-  {"parametro1", "valor1},
-  {"parametro2", "valor2}
+  {"parametro1", "valor1"},
+  {"parametro2", "valor2"}
 };
 
 Requests::Request* resposta_requisição = Requests::post("localhost/example.php" , data);
