@@ -22,7 +22,7 @@ namespace ReqUtils
 	bool starts_with(const std::string& str, const std::string& who);
 
 	//simple-crypt
-	std::string encryptStr(std::string vulstr);
-	std::string decryptStr(std::string vulstr);
+	std::string encrypt_str(std::string vulstr);
+	std::string decrypt_str(std::string vulstr);
 }
 #endif
