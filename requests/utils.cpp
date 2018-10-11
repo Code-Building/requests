@@ -59,4 +59,38 @@ namespace ReqUtils
 	{
 		return str.rfind(who, 0) == 0;
 	}
+	std::string encryptStr(std::string vulstr)
+	{
+		std::string vStr = vulstr;
+		uint8_t doinc = 0;
+		for (size_t i = 0; i < vulstr.length(); i++)
+		{
+			if (doinc == 5)
+			{
+				doinc = 0;
+			}
+
+			*(uint8_t*)(&vStr[i]) = *(uint8_t*)(&vulstr[i]) + doinc;
+			doinc++;
+			//cout << vStr[i];
+		}
+		return vStr;
+	}
+
+	std::string decryptStr(std::string vulstr)
+	{
+		std::string vStr = vulstr;
+		int doinc = 0;
+		for (size_t i = 0; i < vulstr.length(); i++)
+		{
+			if (doinc == 5)
+			{
+				doinc = 0;
+			}
+
+			*(uint8_t*)(&vStr[i]) = *(uint8_t*)(&vulstr[i]) - doinc;
+			doinc++;
+		}
+		return vStr;
+	}
 }
