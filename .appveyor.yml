@@ -8,11 +8,15 @@ configuration:
     
 
 artifacts:
+- path: requests\http.h
+  name: requests::http header
+- path: requests\utils.h
+  name: requests::utils header
 - path: Release\requests.lib
   name: requests_x86_release.lib
 - path: Debug\requests.lib
   name: requests_x86_debug.lib
-- path: x64\Debug\requests.lib
+- path: x64\Release\requests.lib
   name: requests_x64_debug.lib
 - path: x64\Debug\requests.lib
   name: requests_x64_debug.lib
