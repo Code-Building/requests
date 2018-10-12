@@ -6,6 +6,13 @@ configuration:
   - Debug
   - Release
     
+
 artifacts:
-  - path: if "%Platform%" == "x86" ($(configuration)\*.*) else ( x64\$(configuration)\*.* )
-    name: RequestsLib$(configuration)$(platform)
+- path: Release\requests.lib
+  name: requests_x86_release.lib
+- path: Debug\requests.lib
+  name: requests_x86_debug.lib
+- path: x64\Debug\requests.lib
+  name: requests_x64_debug.lib
+- path: x64\Debug\requests.lib
+  name: requests_x64_debug.lib
