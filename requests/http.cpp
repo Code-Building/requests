@@ -6,7 +6,7 @@
 namespace Requests
 {
 	request* execute(const req_headers& h_data, const u_short port, const std::string& headers,
-	                 const std::string& request_host)
+		const std::string& request_host)
 	{
 		auto this_req = new request;
 		char buffer[10000];
@@ -44,7 +44,7 @@ namespace Requests
 
 		auto res_headers_parsed = ReqUtils::parse_res_headers(raw_headers);
 
-		const auto implicit_lentgh = ! res_headers_parsed.count("Content-Length");
+		const auto implicit_lentgh = !res_headers_parsed.count("Content-Length");
 
 
 		if (implicit_lentgh)
@@ -55,7 +55,7 @@ namespace Requests
 			const int hexstream_len = hexstream.tellg();
 			hexstream.seekg(0, std::ios::beg);
 			raw_buff = raw_buff.substr(
-				/*size of content-lentgh*/ + hexstream_len +
+				/*size of content-lentgh*/ +hexstream_len +
 				/*size of \r\n*/ 2
 			);
 			this_req->content_length = static_cast<int>(dec_len);
@@ -78,6 +78,9 @@ namespace Requests
 		else if (ReqUtils::starts_with(url, "https://"))
 			url = url.substr(8);
 
+		if (url[url.length()] != '/' && ReqUtils::string_index(url, "/") == -1)
+			url += "/";
+
 		const auto get_request_raw = ReqUtils::populate_uri(url);
 		const auto request_host = ReqUtils::split(url, '/')[0];
 
@@ -94,6 +97,9 @@ namespace Requests
 			url = url.substr(7);
 		else if (ReqUtils::starts_with(url, "https://"))
 			url = url.substr(8);
+
+		if (url[url.length()] != '/' && ReqUtils::string_index(url, "/") == -1)
+			url += "/";
 
 		const auto requested_uri_raw = ReqUtils::populate_uri(url);
 		const auto request_host = ReqUtils::split(url, '/')[0];

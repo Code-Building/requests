@@ -9,7 +9,6 @@
 namespace ReqUtils
 {
 
-
 	//generators
 	std::string populate_uri(const std::string& content);
 	std::string generate_post(Requests::post_data pdata_map);
