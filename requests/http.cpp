@@ -1,6 +1,7 @@
 #include "http.h"
 #include "utils.h"
 #include <iostream>
+#include <sstream>
 
 namespace Requests
 {
@@ -42,32 +43,52 @@ namespace Requests
 		closesocket(Socket);
 		WSACleanup();
 
-		const auto rawBuff = std::string(buffer);
-		this_req->content_length = atoi(ReqUtils::return_between(rawBuff, "Content-Length: ", "\r\n").c_str());
-		this_req->status_code = ReqUtils::return_between(rawBuff, "HTTP/1.1 ", "\r\n");
-		this_req->date = ReqUtils::return_between(rawBuff, "Date: ", "\r\n");
-		this_req->server = ReqUtils::return_between(rawBuff, "Server: ", "\r\n");
-		this_req->last_modified = ReqUtils::return_between(rawBuff, "Last-Modified: ", "\r\n");
-		this_req->content_type = ReqUtils::return_between(rawBuff, "Content-Type: ", "\r\n");
-		this_req->content_encoding = ReqUtils::return_between(rawBuff, "Content-Encoding: ", "\r\n");
+		std::string raw_buff = std::string(buffer);
 
 
-		std::string reverse_buff;
-		auto len = this_req->content_length;
 
-		for (auto buff_iteration = sizeof buffer / sizeof *buffer; buff_iteration != 0; --buff_iteration)
+		
+
+
+		this_req->content_length = atoi(ReqUtils::return_between(raw_buff, "Content-Length: ", "\r\n").c_str());
+		const auto implicit_lentgh = this_req->content_length == 0;
+
+
+		this_req->status_code = ReqUtils::return_between(raw_buff, "HTTP/1.1 ", "\r\n");
+		this_req->date = ReqUtils::return_between(raw_buff, "Date: ", "\r\n");
+		this_req->server = ReqUtils::return_between(raw_buff, "Server: ", "\r\n");
+		this_req->last_modified = ReqUtils::return_between(raw_buff, "Last-Modified: ", "\r\n");
+		this_req->content_type = ReqUtils::return_between(raw_buff, "Content-Type: ", "\r\n");
+		this_req->content_encoding = ReqUtils::return_between(raw_buff, "Content-Encoding: ", "\r\n");
+
+
+
+		std::stringstream hexstream;
+		int dec_len;
+		auto const headers_len = ReqUtils::string_index(raw_buff, "\r\n\r\n");
+		raw_buff = raw_buff.substr(headers_len);
+
+		
+
+		if(implicit_lentgh)
 		{
-			if (buffer[buff_iteration] != -52 || buffer[buff_iteration] == '\n' || buffer[buff_iteration] == '\r')
-				while (len != 0)
-				{
-					reverse_buff += buffer[buff_iteration];
-					buff_iteration--;
-					len--;
-				}
-		}
+			hexstream << std::hex << ReqUtils::return_between(raw_buff, "\r\n\r\n", "\r\n");
+			hexstream >> dec_len;
+			hexstream.seekg(0, std::ios::end);
+			const int hexstream_len = hexstream.tellg();
+			hexstream.seekg(0, std::ios::beg);
+			raw_buff = raw_buff.substr(
+				/*size of \r\n\r\n*/4
+				/*size of content-lentgh*/ + hexstream_len +
+				/*size of \r\n*/ 2
+			);
+			this_req->content_length = static_cast<int>(dec_len);
+		}else
+			raw_buff = raw_buff.substr(
+			/*size of \r\n\r\n*/4
+		);
 
-		std::string response(reverse_buff);
-		std::reverse(response.begin(), response.end());
+		auto const response(raw_buff.substr(0,this_req->content_length));
 		this_req->text = response;
 
 		return this_req;
@@ -114,33 +135,44 @@ namespace Requests
 		closesocket(Socket);
 		WSACleanup();
 
-		const auto rawBuff = std::string(buffer);
-		this_req->content_length = atoi(ReqUtils::return_between(rawBuff, "Content-Length: ", "\r\n").c_str());
-		this_req->status_code = ReqUtils::return_between(rawBuff, "HTTP/1.1 ", "\r\n");
-		this_req->date = ReqUtils::return_between(rawBuff, "Date: ", "\r\n");
-		this_req->server = ReqUtils::return_between(rawBuff, "Server: ", "\r\n");
-		this_req->last_modified = ReqUtils::return_between(rawBuff, "Last-Modified: ", "\r\n");
-		this_req->content_type = ReqUtils::return_between(rawBuff, "Content-Type: ", "\r\n");
+		auto raw_buff = std::string(buffer);
+		this_req->content_length = atoi(ReqUtils::return_between(raw_buff, "Content-Length: ", "\r\n").c_str());
+		const auto implicit_lentgh = this_req->content_length == 0;
+
+		this_req->status_code = ReqUtils::return_between(raw_buff, "HTTP/1.1 ", "\r\n");
+		this_req->date = ReqUtils::return_between(raw_buff, "Date: ", "\r\n");
+		this_req->server = ReqUtils::return_between(raw_buff, "Server: ", "\r\n");
+		this_req->last_modified = ReqUtils::return_between(raw_buff, "Last-Modified: ", "\r\n");
+		this_req->content_type = ReqUtils::return_between(raw_buff, "Content-Type: ", "\r\n");
 
 
-		std::string reverse_buff;
-		auto len = this_req->content_length;
+		std::stringstream hexstream;
+		int dec_len;
+		auto const headers_len = ReqUtils::string_index(raw_buff, "\r\n\r\n");
+		raw_buff = raw_buff.substr(headers_len);
 
-		for (auto buff_iteration = sizeof buffer / sizeof *buffer; buff_iteration != 0; --buff_iteration)
+
+
+		if (implicit_lentgh)
 		{
-			if (buffer[buff_iteration] >= 32 || buffer[buff_iteration] == '\n' || buffer[buff_iteration] == '\r')
-			{
-				while (len != 0)
-				{
-					reverse_buff += buffer[buff_iteration];
-					buff_iteration--;
-					len--;
-				}
-			}
+			hexstream << std::hex << ReqUtils::return_between(raw_buff, "\r\n\r\n", "\r\n");
+			hexstream >> dec_len;
+			hexstream.seekg(0, std::ios::end);
+			const int hexstream_len = hexstream.tellg();
+			hexstream.seekg(0, std::ios::beg);
+			raw_buff = raw_buff.substr(
+				/*size of \r\n\r\n*/4
+				/*size of content-lentgh*/ + hexstream_len +
+				/*size of \r\n*/ 2
+			);
+			this_req->content_length = static_cast<int>(dec_len);
 		}
+		else
+			raw_buff = raw_buff.substr(
+				/*size of \r\n\r\n*/4
+			);
 
-		std::string response(reverse_buff);
-		std::reverse(response.begin(), response.end());
+		auto const response(raw_buff.substr(0, this_req->content_length));
 		this_req->text = response;
 
 		return this_req;

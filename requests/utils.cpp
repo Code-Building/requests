@@ -59,6 +59,12 @@ namespace ReqUtils
 	{
 		return str.rfind(who, 0) == 0;
 	}
+
+	int string_index(const std::string& str, const std::string& who)
+	{
+		return str.find(who);
+	}
+
 	std::string encrypt_str(std::string vulstr)
 	{
 		auto v_str = vulstr;
