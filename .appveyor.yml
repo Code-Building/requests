@@ -6,5 +6,10 @@ configuration:
   - Debug
   - Release
 artifacts:
+if [$(platform)] == "x86"(
   - path: $(configuration)\*.*
-    name: RequestsLib$(configuration)
+    name: RequestsLib$(configuration)$(platform)
+)else(
+  - path: x64\$(configuration)\*.*
+    name: RequestsLib$(configuration)$(platform)
+    )
