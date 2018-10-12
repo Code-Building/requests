@@ -5,11 +5,20 @@ platform:
 configuration:
   - Debug
   - Release
+install:
+- ps: >-
+    If ($env:Platform -Match "x86") {
+     mkdir lib/x86/include
+     mv requests/http.h lib/x86/$env:Configuration/include
+     mv requests/utils.h lib/x86/$env:Configuration/include
+     mv $env:Configuration/requests.lib lib/x86/$env:Configuration/requests.lib
+    } Else {
+     mkdir lib/x64/include
+     mv requests/http.h lib/x64/$env:Configuration/include
+     mv requests/utils.h lib/x64/$env:Configuration/
+     mv x64/$env:Configuration/requests.lib lib/x64//$env:Configuration/requests.lib
+    }
+
 artifacts:
-if [$(platform)] == "x86"(
-  - path: $(configuration)\*.*
+  - path: lib\$(platform)\$(configuration)\*.*
     name: RequestsLib$(configuration)$(platform)
-)else(
-  - path: x64\$(configuration)\*.*
-    name: RequestsLib$(configuration)$(platform)
-    )
