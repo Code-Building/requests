@@ -5,11 +5,7 @@ platform:
 configuration:
   - Debug
   - Release
-
-after_deploy:
- - if $env:Platform -Match "x86" mkdir lib/x86/include mv requests/http.h lib/x86/$env:Configuration/include  mv requests/utils.h lib/x86/$env:Configuration/include mv $env:Configuration/requests.lib lib/x86/$env:Configuration/requests.lib else mkdir lib/x64/include mv requests/http.h lib/x64/$env:Configuration/include mv requests/utils.h lib/x64/$env:Configuration/ mv x64/$env:Configuration/requests.lib lib/x64//$env:Configuration/requests.lib
     
-
 artifacts:
-  - path: lib\$(platform)\$(configuration)\*.*
+  - path: if "%Platform%" == "x86" ($(configuration)\*.*) else ( x64\$(configuration)\*.* )
     name: RequestsLib$(configuration)$(platform)
