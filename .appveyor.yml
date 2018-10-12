@@ -5,8 +5,8 @@ platform:
 configuration:
   - Debug
   - Release
-install:
-- ps: >-
+deploy_script:
+  - ps: >-
     If ($env:Platform -Match "x86") {
      mkdir lib/x86/include
      mv requests/http.h lib/x86/$env:Configuration/include
