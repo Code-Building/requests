@@ -36,22 +36,15 @@ namespace Requests
 		auto raw_buff = std::string(buffer);
 
 
-		this_req->content_length = atoi(ReqUtils::return_between(raw_buff, "Content-Length: ", "\r\n").c_str());
-		const auto implicit_lentgh = this_req->content_length == 0;
-
-
-		this_req->status_code = ReqUtils::return_between(raw_buff, "HTTP/1.1 ", "\r\n");
-		this_req->date = ReqUtils::return_between(raw_buff, "Date: ", "\r\n");
-		this_req->server = ReqUtils::return_between(raw_buff, "Server: ", "\r\n");
-		this_req->last_modified = ReqUtils::return_between(raw_buff, "Last-Modified: ", "\r\n");
-		this_req->content_type = ReqUtils::return_between(raw_buff, "Content-Type: ", "\r\n");
-		this_req->content_encoding = ReqUtils::return_between(raw_buff, "Content-Encoding: ", "\r\n");
-
-
 		std::stringstream hexstream;
 		int dec_len;
 		auto const headers_len = ReqUtils::string_index(raw_buff, "\r\n\r\n");
-		raw_buff = raw_buff.substr(headers_len);
+		auto const raw_headers = raw_buff.substr(0, headers_len);
+		raw_buff = raw_buff.substr(headers_len + 4);
+
+		auto res_headers_parsed = ReqUtils::parse_res_headers(raw_headers);
+
+		const auto implicit_lentgh = ! res_headers_parsed.count("Content-Length");
 
 
 		if (implicit_lentgh)
@@ -62,19 +55,18 @@ namespace Requests
 			const int hexstream_len = hexstream.tellg();
 			hexstream.seekg(0, std::ios::beg);
 			raw_buff = raw_buff.substr(
-				/*size of \r\n\r\n*/4
 				/*size of content-lentgh*/ + hexstream_len +
 				/*size of \r\n*/ 2
 			);
 			this_req->content_length = static_cast<int>(dec_len);
 		}
 		else
-			raw_buff = raw_buff.substr(
-				/*size of \r\n\r\n*/4
-			);
+			this_req->content_length = atoi(res_headers_parsed["Content-Length"].c_str());
 
 		auto const response(raw_buff.substr(0, this_req->content_length));
+		this_req->headers = res_headers_parsed;
 		this_req->text = response;
+		this_req->status_code = res_headers_parsed["Status"];
 
 		return this_req;
 	}

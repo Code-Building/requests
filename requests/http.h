@@ -12,6 +12,7 @@ namespace Requests
 {
 	typedef std::map<std::string, std::string> post_data;
 	typedef std::map<std::string, std::string> req_headers;
+	typedef std::map<std::string, std::string> res_headers;
 
 	const req_headers DEFAULT_HEADERS = {{"Connection", "close"}, {"Accept-Charset", "utf-8"}};
 	const req_headers DEFAULT_POST_HEADERS = {
@@ -21,13 +22,9 @@ namespace Requests
 	struct request
 	{
 		std::string status_code;
-		std::string date;
-		std::string server;
-		std::string last_modified;
 		int content_length{};
-		std::string content_type;
-		std::string content_encoding;
 		std::string text;
+		res_headers headers;
 	};
 
 

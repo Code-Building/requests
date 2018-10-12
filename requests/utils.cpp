@@ -26,6 +26,28 @@ namespace ReqUtils
 		return headers;
 	}
 
+	std::map<std::string, std::string> parse_res_headers(std::string raw_headers)
+	{
+		std::map<std::string, std::string> formatted;
+		const auto x = string_index(raw_headers, "\r\n");
+		auto http_res = raw_headers.substr(8, x - 8);
+		http_res.erase(0, 1);
+		formatted["Status"] = http_res;
+		raw_headers = raw_headers.substr(x);
+
+		while (string_index(raw_headers, "\r\n") != -1)
+		{
+			raw_headers = raw_headers.substr(string_index(raw_headers, "\r\n") + 2);
+			const auto delimeter = string_index(raw_headers, ":");
+			auto value = return_between(raw_headers, ":", "\r\n");
+			value.erase(0, 1);
+			const auto header = raw_headers.substr(0, delimeter);
+			formatted[header] = value;
+		}
+
+		return formatted;
+	}
+
 	std::string populate_uri(const std::string& content)
 	{
 		std::string uri;
@@ -77,7 +99,7 @@ namespace ReqUtils
 		}
 		return v_str;
 	}
-	
+
 	std::string decrypt_str(std::string vulstr)
 	{
 		auto v_str = vulstr;

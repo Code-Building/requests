@@ -14,6 +14,7 @@ namespace ReqUtils
 	std::string populate_uri(const std::string& content);
 	std::string generate_post(Requests::post_data pdata_map);
 	std::string parse_headers(std::map<std::string, std::string> h_map);
+	std::map<std::string,std::string> parse_res_headers(std::string raw_headers);
 
 
 	//text parsing-related
