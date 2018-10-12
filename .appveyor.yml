@@ -4,3 +4,5 @@ platform: x86
 artifacts:
   - path: $(configuration)\*.*
     name: RequestsLib
+configuration: Debug
+platform: x86
