@@ -23,6 +23,10 @@ namespace ReqUtils
 		std::string headers;
 		for (auto& it : h_map)
 			headers += it.first + ": " + it.second + "\r\n";
+		if (!h_map.count("Content-Type")) {
+			h_map["Content-Type"] = "application/x-www-form-urlencoded";
+			headers += "Content-Type: application/x-www-form-urlencoded\r\n";
+		}
 		return headers;
 	}
 
