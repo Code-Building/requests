@@ -28,11 +28,12 @@ namespace Requests
 			throw std::exception("Could not connect through Socket.");
 
 		send(Socket, headers.c_str(), int(strlen(headers.c_str())), 0);
-
 		recv(Socket, buffer, 10000, 0);
+
 		closesocket(Socket);
 		WSACleanup();
 
+		
 		auto raw_buff = std::string(buffer);
 
 
