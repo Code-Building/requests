@@ -1,3 +1,11 @@
+// This file is part of the "requests" project, https://github.com/Code-Building/requests
+//   (c) 2018 Code Building https://codebuilding.org
+//
+// Licensed under the MIT License (the "License"); you may not use this
+// file except in compliance with the License. You may obtain a copy of
+// the License at: http://opensource.org/licenses/MIT
+
+
 #include "http.h"
 #include "utils.h"
 #include <iostream>
@@ -5,74 +13,121 @@
 
 namespace Requests
 {
-	request* execute(const req_headers& h_data, const u_short port, const std::string& headers,
-		const std::string& request_host)
+	request* execute(const DWORD verb,
+	                 const std::string& user_agent,
+	                 const std::string& hostname,
+	                 const std::string& raw_uri,
+	                 const std::map<std::string, std::string>& opt_headers,
+	                 const std::string& pdata)
 	{
 		auto this_req = new request;
-		char buffer[10000];
-		WSADATA wsa_data;
-		SOCKADDR_IN sock_addr;
-
-		if (WSAStartup(MAKEWORD(2, 2), &wsa_data) != 0)
-			throw std::exception("WSAStartup Failed");
-
-		auto const Socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-		auto const host = gethostbyname(request_host.c_str());
-
-		sock_addr.sin_port = htons(port);
-		sock_addr.sin_family = AF_INET;
-		sock_addr.sin_addr.s_addr = *reinterpret_cast<unsigned long *>(host->h_addr);
+		std::wstring response_header;
+		std::vector<char> response_body;
+		std::string plain_text;
+		DWORD header_size = 0;
+		DWORD dw_downloaded;
 
 
-		if (connect(Socket, reinterpret_cast<SOCKADDR *>(&sock_addr), sizeof(sock_addr)) != 0)
-			throw std::exception("Could not connect through Socket.");
-
-		send(Socket, headers.c_str(), int(strlen(headers.c_str())), 0);
-		recv(Socket, buffer, 10000, 0);
-
-		closesocket(Socket);
-		WSACleanup();
-
-		
-		auto raw_buff = std::string(buffer);
+		const auto pd = const_cast<char*>(pdata.c_str());
+		const DWORD pdata_len = strlen(pd);
 
 
-		std::stringstream hexstream;
-		int dec_len;
-		auto const headers_len = ReqUtils::string_index(raw_buff, "\r\n\r\n");
-		auto const raw_headers = raw_buff.substr(0, headers_len);
-		raw_buff = raw_buff.substr(headers_len + 4);
+		DWORD dw_size = 0;
+		LPVOID lp_out_buffer = nullptr;
+		BOOL b_results = false;
+		HINTERNET h_session = nullptr, h_connect = nullptr, h_request = nullptr;
 
-		auto res_headers_parsed = ReqUtils::parse_res_headers(raw_headers);
+		h_session = WinHttpOpen(ReqUtils::to_lpcwstr(user_agent.c_str()), WINHTTP_ACCESS_TYPE_DEFAULT_PROXY, nullptr,
+		                        nullptr, 0);
 
-		const auto implicit_lentgh = !res_headers_parsed.count("Content-Length");
+		if (h_session)
+			h_connect = WinHttpConnect(h_session, ReqUtils::to_lpcwstr(hostname.c_str()), INTERNET_DEFAULT_HTTP_PORT,
+			                           0);
 
+		if (h_connect)
+			h_request = WinHttpOpenRequest(h_connect, verb == 1 ? L"GET" : L"POST",
+			                               ReqUtils::to_lpcwstr(raw_uri.c_str()), nullptr, nullptr, nullptr, 0);
 
-		if (implicit_lentgh)
+		for (auto& it : opt_headers)
 		{
-			hexstream << std::hex << ReqUtils::return_between(raw_buff, "\r\n\r\n", "\r\n");
-			hexstream >> dec_len;
-			hexstream.seekg(0, std::ios::end);
-			const int hexstream_len = hexstream.tellg();
-			hexstream.seekg(0, std::ios::beg);
-			raw_buff = raw_buff.substr(
-				/*size of content-lentgh*/ +hexstream_len +
-				/*size of \r\n*/ 2
-			);
-			this_req->content_length = static_cast<int>(dec_len);
+			auto header = it.first + ": " + it.second;
+			WinHttpAddRequestHeaders(h_request,
+			                         ReqUtils::to_lpcwstr(header.c_str()),
+			                         -1L,
+			                         WINHTTP_ADDREQ_FLAG_ADD);
 		}
-		else
-			this_req->content_length = atoi(res_headers_parsed["Content-Length"].c_str());
 
-		auto const response(raw_buff.substr(0, this_req->content_length));
-		this_req->headers = res_headers_parsed;
-		this_req->text = response;
-		this_req->status_code = res_headers_parsed["Status"];
 
+		if (h_request)
+			b_results = WinHttpSendRequest(h_request, nullptr, 0, verb == 2 ? pd : nullptr, verb == 2 ? pdata_len : 0,
+			                               verb == 2 ? pdata_len : 0, 0);
+
+		if (b_results)
+			b_results = WinHttpReceiveResponse(h_request, nullptr);
+
+		if (b_results)
+		{
+			b_results = WinHttpQueryHeaders(h_request, WINHTTP_QUERY_RAW_HEADERS_CRLF, nullptr, nullptr, &header_size,
+			                                nullptr);
+			if ((!b_results) && (GetLastError() == ERROR_INSUFFICIENT_BUFFER))
+			{
+				response_header.resize(header_size / sizeof(wchar_t));
+				if (response_header.empty())
+					b_results = TRUE;
+				else
+				{
+					b_results = WinHttpQueryHeaders(h_request, WINHTTP_QUERY_RAW_HEADERS_CRLF, nullptr,
+					                                &response_header[0], &header_size, nullptr);
+					if (!b_results) header_size = 0;
+					response_header.resize(header_size / sizeof(wchar_t));
+				}
+			}
+		}
+		if (b_results)
+		{
+			do
+			{
+				dw_size = 0;
+				b_results = WinHttpQueryDataAvailable(h_request, &dw_size);
+				if (!b_results)
+					throw std::exception("Uncaught error on WinHttpQueryDataAvailable()");
+
+				if (dw_size == 0)
+					break;
+
+				do
+				{
+					const DWORD dw_offset = response_body.size();
+					response_body.resize(dw_offset + dw_size);
+
+					b_results = WinHttpReadData(h_request, &response_body[dw_offset], dw_size, &dw_downloaded);
+					if (!b_results)
+						throw std::exception("Uncaught exception on WinHttpReadData()");
+
+					response_body.resize(dw_offset + dw_downloaded);
+
+					if (dw_downloaded == 0)
+						break;
+
+					dw_size -= dw_downloaded;
+				}
+				while (dw_size > 0);
+			}
+			while (true);
+		}
+
+		for (auto& x : response_body)
+			plain_text += x;
+
+		this_req->text = plain_text;
+		this_req->headers = ReqUtils::parse_res_headers(std::string(response_header.begin(), response_header.end()));
+		const auto len_header_value = this_req->headers["Content-Length"].c_str();
+		this_req->status_code = this_req->headers["Status"];
+		this_req->content_length = atoi(len_header_value);
 		return this_req;
 	}
 
-	request* get(std::string url, const req_headers& h_data, const u_short port)
+	request* get(std::string url, req_headers h_data, const u_short port)
 	{
 		if (ReqUtils::starts_with(url, "http://"))
 			url = url.substr(7);
@@ -82,35 +137,34 @@ namespace Requests
 		if (url[url.length()] != '/' && ReqUtils::string_index(url, "/") == -1)
 			url += "/";
 
-		const auto get_request_raw = ReqUtils::populate_uri(url);
-		const auto request_host = ReqUtils::split(url, '/')[0];
-
-		const auto requested_headers = "GET " + get_request_raw + " HTTP/1.1\r\nHost: " +
-			request_host + "\r\n" +
-			ReqUtils::parse_headers(h_data) + "\r\n\r\n";
-
-		return execute(h_data, port, requested_headers, request_host);
-	}
-
-	request* post(std::string url, const post_data& pdata, const req_headers& h_data, const u_short port)
-	{
-		if (ReqUtils::starts_with(url, "http://"))
-			url = url.substr(7);
-		else if (ReqUtils::starts_with(url, "https://"))
-			url = url.substr(8);
-
-		if (url[url.length()] != '/' && ReqUtils::string_index(url, "/") == -1)
-			url += "/";
+		const auto opt_headers = ReqUtils::parse_headers(h_data, 1);
+		const auto ua = h_data["User-Agent"];
 
 		const auto requested_uri_raw = ReqUtils::populate_uri(url);
 		const auto request_host = ReqUtils::split(url, '/')[0];
-		auto post_data_str = ReqUtils::generate_post(pdata);
 
-		const auto requested_headers = "POST " + requested_uri_raw + " HTTP/1.1\r\nHost: " + request_host + "\r\n" +
-			ReqUtils::parse_headers(h_data) + "Content-Length: " + std::to_string(
-				post_data_str.length()) +
-			"\r\n\r\n" + post_data_str + "\r\n\r\n";
 
-		return execute(h_data, port, requested_headers, request_host);
+		return execute(1, ua, request_host, requested_uri_raw, opt_headers, "");
+	}
+
+	request* post(std::string url, const post_data& pdata, req_headers h_data, const u_short port)
+	{
+		if (ReqUtils::starts_with(url, "http://"))
+			url = url.substr(7);
+		else if (ReqUtils::starts_with(url, "https://"))
+			url = url.substr(8);
+
+		if (url[url.length()] != '/' && ReqUtils::string_index(url, "/") == -1)
+			url += "/";
+
+		const auto opt_headers = ReqUtils::parse_headers(h_data, 2);
+		const auto ua = h_data["User-Agent"];
+
+		const auto requested_uri_raw = ReqUtils::populate_uri(url);
+		const auto request_host = ReqUtils::split(url, '/')[0];
+		const auto post_data_str = ReqUtils::generate_post(pdata);
+
+
+		return execute(2, ua, request_host, requested_uri_raw, opt_headers, post_data_str);
 	}
 }

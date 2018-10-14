@@ -1,12 +1,12 @@
 #ifndef HTTP_H
 #define HTTP_H
 #pragma once
-#define _WINSOCK_DEPRECATED_NO_WARNINGS
-#include <winsock2.h>
+#include <Windows.h>
+#include <winhttp.h>
 #include <string>
 #include <map>
 
-#pragma comment(lib, "Ws2_32.lib")
+#pragma comment(lib, "winhttp.lib")
 
 namespace Requests
 {
@@ -14,9 +14,9 @@ namespace Requests
 	typedef std::map<std::string, std::string> req_headers;
 	typedef std::map<std::string, std::string> res_headers;
 
-	const req_headers DEFAULT_HEADERS = {{"Connection", "close"}, {"Accept-Charset", "utf-8"}};
+	const req_headers DEFAULT_HEADERS = {{"User-Agent", "Requests 2.0"}};
 	const req_headers DEFAULT_POST_HEADERS = {
-		{"Content-Type", "application/x-www-form-urlencoded"}, {"Accept-Charset", "utf-8"}
+		{"Content-Type", "application/x-www-form-urlencoded"}, {"User-Agent", "Requests 2.0"}
 	};
 
 	struct request
@@ -28,11 +28,17 @@ namespace Requests
 	};
 
 
-	request* execute(const req_headers& h_data, u_short port, const std::string& headers,
-	                 const std::string& request_host);
+	request* execute(
+		DWORD verb,
+		const std::string& user_agent,
+		const std::string& hostname,
+		const std::string& raw_uri,
+		const std::map<std::string, std::string>& opt_headers,
+		const std::string& pdata
+	);
 
-	request* get(std::string url, const req_headers& h_data = DEFAULT_HEADERS, u_short port = 80);
-	request* post(std::string url, const post_data& pdata, const req_headers& h_data = DEFAULT_POST_HEADERS,
+	request* get(std::string url, req_headers h_data = DEFAULT_HEADERS, u_short port = 80);
+	request* post(std::string url, const post_data& pdata, req_headers h_data = DEFAULT_POST_HEADERS,
 	              u_short port = 80);
 }
 #endif
