@@ -48,12 +48,10 @@ namespace ReqUtils
 		return output;
 	}
 
-	// Parse Headers function will recieve a map of two std::string's and return 
-	// the HTTP-style request headers, -> Name: Value CLRF <-
-	// this is solved by looping through all given map keys and values and formatting
-	// then like -> Name: Value CLRF <-.
-	// so if the given map has 1 index and it is "User-Agent" the return will be
-	// User-Agent: h_map["User-Agent"]\r\n
+	// Parse Headers function will recieve a map of two std::string's and then check
+	// if crucial headers is included in that map, if not, it will include automatically
+	// this is solved by looping through all given map keys and values and checking each
+	// of them.
 	std::map<std::string, std::string> parse_headers(std::map<std::string, std::string> h_map, const DWORD verb)
 	{
 		if (!h_map.count("Content-Type") && verb == 2)
@@ -96,6 +94,8 @@ namespace ReqUtils
 		return formatted;
 	}
 
+	// To LPCWSTR function will take a const char* and
+	// then translate it into const wchar_t* aka LPCWSTR
 	LPCWSTR to_lpcwstr(const char* text)
 	{
 		const auto size = strlen(text) + 1;
@@ -105,6 +105,9 @@ namespace ReqUtils
 		return wtext;
 	}
 
+	// Populate URI function, will take a string, split it
+	// with '/' delimeter, skip the first index(hostname)
+	// and then re-create the URL requested path
 	std::string populate_uri(const std::string& content)
 	{
 		std::string uri;
@@ -114,6 +117,8 @@ namespace ReqUtils
 		return uri;
 	}
 
+	// Generate Post function will take a std::map<std::string,std::string>
+	// then create a post payload string with each of it values.
 	std::string generate_post(Requests::post_data pdata_map)
 	{
 		std::string generated;
@@ -123,6 +128,13 @@ namespace ReqUtils
 		return generated;
 	}
 
+	// Return Between function will take a string and two delimeters to
+	// search for which string is between those two delimeters.
+	// first, it will search for the index of first delimeter then
+	// store the length of that first delimeter, make a new variable
+	// with substring on the end of first delimeter length and just
+	// find the pos of second delimeter to use substring with
+	// the substring of frist delimeter -to- last delimeter position.
 	std::string return_between(const std::string& s, const std::string& start_delim, const std::string& stop_delim)
 	{
 		const auto first_delim_pos = s.find(start_delim);
@@ -134,11 +146,15 @@ namespace ReqUtils
 		                                last_delim_pos);
 	}
 
+	// Starts with function checks if a N string is at position 0
+	// of string X.
 	bool starts_with(const std::string& str, const std::string& who)
 	{
 		return str.rfind(who, 0) == 0;
 	}
 
+	// String Index function will return a N string position at
+	// a string X.
 	int string_index(const std::string& str, const std::string& who)
 	{
 		return str.find(who);
