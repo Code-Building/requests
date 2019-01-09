@@ -1,5 +1,7 @@
 # Requests
 
+Uma biblioteca C++ para enviar requisições em http, para facilitar na hora de programar.
+
 ### Code Building
 
 
@@ -53,4 +55,6 @@ printf("%s",resposta_requisição->text.c_str());
 
 valor1valor2
 ```
+## License
 
+Licenciada abaixo da Licença [MIT](LICENSE).
