@@ -57,4 +57,4 @@ valor1valor2
 ```
 ## License
 
-Licensed under the [MIT](LICENSE.txt) License.
+Licenciada abaixo da Licença [MIT](LICENSE.txt).
