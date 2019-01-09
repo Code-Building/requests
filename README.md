@@ -55,4 +55,6 @@ printf("%s",resposta_requisição->text.c_str());
 
 valor1valor2
 ```
+## License
 
+Licensed under the [MIT](LICENSE.txt) License.
