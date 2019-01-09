@@ -1,5 +1,7 @@
 # Requests
 
+Uma biblioteca C++ para enviar requisições em http, para facilitar na hora de programar.
+
 ### Code Building
 
 
