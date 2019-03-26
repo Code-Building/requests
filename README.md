@@ -54,4 +54,3 @@ printf("%s",resposta_requisição->text.c_str());
 valor1valor2
 ```
 
-MUDANÇA
