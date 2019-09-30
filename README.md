@@ -7,7 +7,7 @@ Uma biblioteca C++ para enviar requisições em http, para facilitar na hora de 
 
 #### Entendendo:
 
-A biblioteca requests é baseada em **win-http**, a API do Windows para HTTP, o objetivo é enviar requisições get e post.
+A biblioteca "requests" é baseada em **win-http**, a API do Windows para HTTP, o objetivo é enviar requisições get e post.
 
 #### Junte-se a nós:
 
