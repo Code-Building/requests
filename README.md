@@ -1,60 +1,56 @@
 # Requests
 
-Uma biblioteca C++ para enviar requisições em http, para facilitar na hora de programar.
+C++ Windows-Based HTTP Library for facility and easiness
 
 ### Code Building
 
 
-#### Entendendo:
+#### Join us:
 
-A biblioteca "requests" é baseada em **win-http**, a API do Windows para HTTP, o objetivo é enviar requisições get e post.
-
-#### Junte-se a nós:
-
-Junte-se a code-building um lugar para conversar sobre tecnologia, envolvendo game-hacking, Hacking e diversas outras coisas.
+Join CodeBuilding
 
 https://codebuilding.org
 
-## Exemplos
+## Examples
 
 
-Exemplo requisição GET
+GET Request Example
 ```cpp
-#include <requests/http.h> // Vamos incluir o header padrão do Requests.
+#include <requests/http.h> // Let's include requests default header
 
-Requests::Request* resposta_requisição = Requests::get("httpbin.org/get");
+requests::Request* request = resquests::get("httpbin.org/get");
 
-printf("%s",resposta_requisição->status_code.c_str());
+printf( "%s", request->status_code.c_str() );
 
-// Saída:
+// Output:
 
 200 OK
 ```
 
-#### Para o seguinte script php:
+#### For the following php script:
 ```php
 <?php
-echo $_POST['parametro1'];
-echo $_POST['parametro2'];
+echo $_POST['parameter1'];
+echo $_POST['parameter2'];
 ?>
 ```
-Exemplo requisição POST
+POST Request example
 ```cpp
 #include <requests/http.h>
 
-Requests::post_data data = {
-  {"parametro1", "valor1"},
-  {"parametro2", "valor2"}
+requests::post_data data = {
+  {"parameter1", "value1"},
+  {"parameter2", "value2"}
 };
 
-Requests::Request* resposta_requisição = Requests::post("localhost/example.php" , data);
+requests::Request* request = requests::post( "localhost/example.php" , data );
 
-printf("%s",resposta_requisição->text.c_str());
+printf( "%s", request->text.c_str() );
 
-// Saída:
+// Output:
 
-valor1valor2
+value1value2
 ```
 ## License
 
-Licenciada abaixo da Licença [MIT](LICENSE).
+[MIT](LICENSE) Licensed.
