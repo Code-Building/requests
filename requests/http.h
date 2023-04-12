@@ -1,5 +1,3 @@
-#ifndef HTTP_H
-#define HTTP_H
 #pragma once
 #include <Windows.h>
 #include <winhttp.h>
@@ -8,7 +6,7 @@
 
 #pragma comment(lib, "winhttp.lib")
 
-namespace Requests
+namespace requests
 {
 	typedef std::map<std::string, std::string> post_data;
 	typedef std::map<std::string, std::string> req_headers;
@@ -41,4 +39,3 @@ namespace Requests
 	request* post(std::string url, const post_data& pdata, req_headers h_data = DEFAULT_POST_HEADERS,
 	              u_short port = 80);
 }
-#endif

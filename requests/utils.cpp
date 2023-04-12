@@ -1,5 +1,5 @@
 // This file is part of the "requests" project, https://github.com/Code-Building/requests
-//   (c) 2018 Code Building https://codebuilding.org
+//   (c) 2019 Code Building https://codebuilding.org
 //
 // Licensed under the MIT License (the "License"); you may not use this
 // file except in compliance with the License. You may obtain a copy of
@@ -9,8 +9,8 @@
 #include "utils.h"
 
 
-/*This namespace is responsible of utilities on processing sockets HTTP responses and their data*/
-namespace ReqUtils
+/*This namespace is responsible of utilities on processing HTTP responses and their data*/
+namespace req_utils
 {
 	// Split function will receive a string and a char. The character will be responsible by 
 	// the separator between strings of the given string.
@@ -32,12 +32,12 @@ namespace ReqUtils
 	// in this case, at "Are" since "You" don't have ':' at the end.
 	// as we need to cover "You" also, we do a last substring bewteen last ':' index and string end.
 	// and push it onto vector.
-	std::vector<std::string> split(const std::string& str, const char seperator)
+	std::vector<std::string> split(const std::string& str, const char separator)
 	{
 		std::vector<std::string> output;
 		std::string::size_type prev_pos = 0, pos = 0;
 
-		while ((pos = str.find(seperator, pos)) != std::string::npos)
+		while ((pos = str.find(separator, pos)) != std::string::npos)
 		{
 			auto substring(str.substr(prev_pos, pos - prev_pos));
 			output.push_back(substring);
@@ -112,14 +112,14 @@ namespace ReqUtils
 	{
 		std::string uri;
 		auto array = split(content, '/');
-		for (auto i = 1; array.size() > i; i++)
+		for (auto i = 1; array.size() > i; ++i)
 			uri += "/" + array[i];
 		return uri;
 	}
 
 	// Generate Post function will take a std::map<std::string,std::string>
 	// then create a post payload string with each of it values.
-	std::string generate_post(Requests::post_data pdata_map)
+	std::string generate_post(requests::post_data pdata_map)
 	{
 		std::string generated;
 		for (auto& it : pdata_map)
@@ -164,11 +164,11 @@ namespace ReqUtils
 	{
 		auto v_str = vulstr;
 		uint8_t doinc = 0;
-		for (size_t i = 0; i < vulstr.length(); i++)
+		for (size_t i = 0; i < vulstr.length(); ++i)
 		{
 			if (doinc == 5) doinc = 0;
 			*reinterpret_cast<uint8_t*>(&v_str[i]) = *reinterpret_cast<uint8_t*>(&vulstr[i]) + doinc;
-			doinc++;
+			++doinc;
 		}
 		return v_str;
 	}
@@ -177,11 +177,11 @@ namespace ReqUtils
 	{
 		auto v_str = vulstr;
 		uint8_t doinc = 0;
-		for (size_t i = 0; i < vulstr.length(); i++)
+		for (size_t i = 0; i < vulstr.length(); ++i)
 		{
 			if (doinc == 5) doinc = 0;
 			*reinterpret_cast<uint8_t*>(&v_str[i]) = *reinterpret_cast<uint8_t*>(&vulstr[i]) - doinc;
-			doinc++;
+			++doinc;
 		}
 		return v_str;
 	}
